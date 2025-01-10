@@ -31,6 +31,7 @@ function CoinPage() {
           <CradsPromo/>
         </div>
       </div>
+      <SuggestionSection/>
     </div>
   )
 }
