@@ -2,7 +2,7 @@
 //date: 10-01-2025
 
 import About from "../components/About"
-import CradsPromo from "../components/CradsPromo"
+import CradsPromo from "../components/CradsPromotion"
 import Crypto from "../components/Crypto"
 import PageHolder from "../components/PageHolder"
 import PerformanceSection from "../components/PerformanceSection"
@@ -16,7 +16,16 @@ import SuggestionSection from "../components/SuggestionSection"
 
 function CoinPage() {
   return (
-    <div></div>
+    <div className="h-full w-screen bg-slate-200/40">
+      <div className="w-screen lg:flex">
+        <div className="lg:w-8/12 lg:ml-14 mx-4">
+             <Crypto/>
+        </div>
+        <div className="lg:w-4/12 lg:mr-14 mx-4">
+          <CradsPromo/>
+        </div>
+      </div>
+    </div>
   )
 }
 
