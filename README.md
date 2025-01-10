@@ -33,7 +33,7 @@ KoinX simplifies crypto taxation and portfolio management for users globally. Ou
 
 ## 🖼️ Project Preview  
 
-![KoinX Frontend Preview](https://via.placeholder.com/800x400)  
+![KoinX Frontend Preview](public/Project_readme.png)  
 *Screenshot of the final project showcasing the Bitcoin price and trending coins.*  
 
 ---
@@ -65,7 +65,7 @@ Visit [http://localhost:3000](http://localhost:3000) (port can be different depe
 ---
 
 ## 🔗 Live Demo  
-View the deployed project here: [KoinX Frontend Assignment on Vercel](https://koinx-assignment.vercel.app/)
+View the deployed project here: [KoinX Frontend Assignment on Vercel](https://koinxfrontendinternassignment.netlify.app/)
 
 ---
 
