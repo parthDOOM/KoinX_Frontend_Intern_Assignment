@@ -19,20 +19,36 @@ function Crypto(): JSX.Element {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get<{
-          bitcoin: CryptoData;
-        }>(
-          "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=inr%2Cusd&include_24hr_change=true"
+        // Fetch BTC/USDT price from Binance
+        const btcResponse = await axios.get(
+          "https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT"
         );
-        setCryptoData(response.data.bitcoin);
-      } catch (error) {}
+
+        // Use a forex API for USD/INR rate
+        const forexResponse = await axios.get(
+          "https://open.er-api.com/v6/latest/USD"
+        );
+
+        const btcUsdPrice = parseFloat(btcResponse.data.lastPrice);
+        const btcUsd24hChange = parseFloat(btcResponse.data.priceChangePercent);
+        const usdInrRate = forexResponse.data.rates.INR;
+
+        setCryptoData({
+          usd: btcUsdPrice,
+          usd_24h_change: btcUsd24hChange,
+          inr: btcUsdPrice * usdInrRate,
+          inr_24h_change: btcUsd24hChange  // Using same percentage change as USD for now
+        });
+      } catch (error) {
+        console.error("Error fetching crypto data:", error);
+      }
     };
+
     fetchData();
-    // Fetch data every 3 seconds to avoid rate limiting
-    const interval = setInterval(fetchData, 3000);
+    // Update every 2 seconds to respect API limits
+    const interval = setInterval(fetchData, 2000);
     return () => clearInterval(interval);
   }, []);
-
   return (
     <div className="bg-white h-max rounded-lg my-5 p-6">
       <div className="flex items-center">
@@ -50,10 +66,10 @@ function Crypto(): JSX.Element {
       <div className="mt-8 flex">
         <div>
           <div className="text-3xl font-semibold text-[#0B1426]">
-            {(cryptoData && `$${cryptoData.usd}`) || `$66759`}
+            {(cryptoData && `$${cryptoData.usd.toFixed(2)}`) || `$66759`}
           </div>
           <div className="text-lg font-medium text-[#0B1426]">
-            {(cryptoData && `₹ ${cryptoData.inr}`) || `₹ 5535287`}
+            {(cryptoData && `₹ ${cryptoData.inr.toFixed(2)}`) || `₹ 5535287`}
           </div>
         </div>
         <div
@@ -85,7 +101,6 @@ function Crypto(): JSX.Element {
               `2.18%`}
           </span>
         </div>
-
         <div className="text-sm text-[#768396] ml-2 mt-2">(24H)</div>
       </div>
       <hr className="my-4" />
