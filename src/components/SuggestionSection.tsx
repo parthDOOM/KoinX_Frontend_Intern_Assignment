@@ -43,7 +43,7 @@ const useCryptoData = (symbols: string[]) => {
     const points: number[] = [];
     const trend = Math.random() > 0.5;
     let current = 50;
-    
+    symbol = "BTC";
     for (let i = 0; i < 50; i++) {
       current += trend ? Math.random() * 2 - 0.8 : Math.random() * 2 - 1.2;
       current = Math.max(30, Math.min(70, current));
