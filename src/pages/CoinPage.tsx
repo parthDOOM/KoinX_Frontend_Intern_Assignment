@@ -20,6 +20,7 @@ function CoinPage() {
       <div className="w-screen lg:flex">
         <div className="lg:w-8/12 lg:ml-14 mx-4">
              <Crypto/>
+             <PerformanceSection/>
         </div>
         <div className="lg:w-4/12 lg:mr-14 mx-4">
           <CradsPromo/>
