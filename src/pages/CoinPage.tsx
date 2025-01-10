@@ -21,6 +21,9 @@ function CoinPage() {
         <div className="lg:w-8/12 lg:ml-14 mx-4">
              <Crypto/>
              <PerformanceSection/>
+              <SentimentSection/>
+              <About/>
+              <Tokenomics/>
         </div>
         <div className="lg:w-4/12 lg:mr-14 mx-4">
           <CradsPromo/>
