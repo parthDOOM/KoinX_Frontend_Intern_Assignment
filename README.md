@@ -9,6 +9,11 @@ KoinX simplifies crypto taxation and portfolio management for users globally. Ou
 
 ---
 
+ **Preview Video**  
+   - As I was having hard time deploying the website due to some errors unknown to me this is the preview video for the better look (I'm trying to deploy it and if I'm successfull I'll add the Link here for now Video it is) [Preview](https://drive.google.com/file/d/12ef_BONPgNi1kj43W5hL8odcotqOUMx5/view?usp=sharing)
+
+---
+
 ## 🚀 Features Implemented  
 
 1. **Figma Design to Code**  
@@ -25,9 +30,6 @@ KoinX simplifies crypto taxation and portfolio management for users globally. Ou
 
 5. **You May Also Like Section**  
    - Horizontally scrollable carousel displaying trending coins with their prices, price changes, and sparkline graphs.  
-
-6. **Dynamic Token Data** *(Optional)*  
-   - Enabled dynamic token views based on the URL (e.g., `/bitcoin`, `/ethereum`).  
 
 ---
 
