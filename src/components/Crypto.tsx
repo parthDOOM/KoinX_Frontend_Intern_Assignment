@@ -37,18 +37,16 @@ function Crypto(): JSX.Element {
           usd: btcUsdPrice,
           usd_24h_change: btcUsd24hChange,
           inr: btcUsdPrice * usdInrRate,
-          inr_24h_change: btcUsd24hChange  // Using same percentage change as USD for now
+          inr_24h_change: btcUsd24hChange, // Using same percentage change as USD for now
         });
       } catch (error) {
         console.error("Error fetching crypto data:", error);
       }
     };
 
-    fetchData();
-    // Update every 2 seconds to respect API limits
-    const interval = setInterval(fetchData, 2000);
-    return () => clearInterval(interval);
-  }, []);
+    fetchData(); // Call fetchData once when the component mounts
+  }, []); // Empty dependency array ensures this effect runs only once
+
   return (
     <div className="bg-white h-max rounded-lg my-5 p-6">
       <div className="flex items-center">

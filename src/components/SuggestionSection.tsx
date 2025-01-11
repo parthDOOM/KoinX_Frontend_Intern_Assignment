@@ -1,7 +1,7 @@
 //This is the Suggestion section of the application
 //date: 10-01-2025
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import type { FC } from 'react';
 
 interface CryptoData {
@@ -28,66 +28,26 @@ const ASSET_MAPPING: { [key: string]: { apiId: string; iconId: string } } = {
   'AVAX': { apiId: 'avalanche', iconId: 'avax' },
   'BTC': { apiId: 'bitcoin', iconId: 'btc' },
   'ETH': { apiId: 'ethereum', iconId: 'eth' },
-  'stETH': { apiId: 'lido-staked-ether', iconId: 'steth' },
+  'stETH': { apiId: 'steth', iconId: 'steth' },
   'UNI': { apiId: 'uniswap', iconId: 'uni' },
   'CFG': { apiId: 'centrifuge', iconId: 'cfg' }
 };
 
-const useCryptoData = (symbols: string[]) => {
-  const [data, setData] = useState<CryptoData[]>([]);
-  const [chartData, setChartData] = useState<{ [key: string]: number[] }>({});
-  const lastUpdateRef = useRef<number | null>(null);
-  const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
-
-  const generateChartData = (symbol: string) => {
-    const points: number[] = [];
-    const trend = Math.random() > 0.5;
-    let current = 50;
-    symbol = "BTC";
-    for (let i = 0; i < 50; i++) {
-      current += trend ? Math.random() * 2 - 0.8 : Math.random() * 2 - 1.2;
-      current = Math.max(30, Math.min(70, current));
-      points.push(current);
-    }
-    return points;
-  };
-
-  const fetchPriceData = async () => {
-    try {
-      const responses = await Promise.all(
-        symbols.map((symbol) =>
-          fetch(`https://api.coincap.io/v2/assets/${ASSET_MAPPING[symbol]?.apiId || symbol.toLowerCase()}`)
-        )
-      );
-      const jsonData = await Promise.all(
-        responses.map((res) => (res.ok ? res.json() : null))
-      );
-      const validData = jsonData.filter((item) => item?.data);
-      
-      const newChartData: { [key: string]: number[] } = {};
-      symbols.forEach((symbol) => {
-        newChartData[symbol] = generateChartData(symbol);
-      });
-      setChartData(newChartData);
-      
-      setData(validData.map((item) => item.data));
-      lastUpdateRef.current = Date.now();
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
-
-  useEffect(() => {
-    const now = Date.now();
-    if (!lastUpdateRef.current || now - lastUpdateRef.current >= CACHE_DURATION) {
-      fetchPriceData();
-    }
-
-    const interval = setInterval(fetchPriceData, CACHE_DURATION);
-    return () => clearInterval(interval);
-  }, [symbols]);
-
-  return { data, chartData };
+const generateChartData = (symbol: string, priceChange: number) => {
+  symbol = symbol.toLowerCase();
+  const points: number[] = [];
+  const direction = priceChange >= 0 ? 1 : -1;
+  let current = 50;
+  const volatility = 0.3; // Reduced volatility for smoother lines
+  
+  for (let i = 0; i < 50; i++) {
+    // Add small random variation but maintain overall trend
+    const change = (Math.random() * volatility - volatility/2) + (direction * 0.1);
+    current += change;
+    current = Math.max(40, Math.min(60, current)); // Reduce range for less dramatic swings
+    points.push(current);
+  }
+  return points;
 };
 
 const CryptoCard: FC<CryptoCardProps> = ({ symbol, price, priceChange, chartData, iconId }) => {
@@ -95,11 +55,37 @@ const CryptoCard: FC<CryptoCardProps> = ({ symbol, price, priceChange, chartData
     `${(index * 4)},${point}`
   ).join(' ');
 
+  // Custom icon URLs for specific coins
+  const getIconUrl = () => {
+    switch(symbol) {
+      case 'stETH':
+        return 'https://assets.coingecko.com/coins/images/13442/thumb/steth_logo.png';
+      case 'CFG':
+        return 'https://assets.coingecko.com/coins/images/15380/standard/centrifuge.PNG?1696515027';
+      case 'BNB':
+        return 'https://assets.coingecko.com/coins/images/825/thumb/bnb-icon2_2x.png';
+      case 'SOL':
+        return 'https://assets.coingecko.com/coins/images/4128/thumb/solana.png';
+      case 'XRP':
+        return 'https://assets.coingecko.com/coins/images/44/thumb/xrp-symbol-white-128.png';
+      case 'ADA':
+        return 'https://assets.coingecko.com/coins/images/975/thumb/cardano.png';
+      case 'AVAX':
+        return 'https://assets.coingecko.com/coins/images/12559/thumb/coin-round-red.png';
+      case 'UNI':
+        return 'https://assets.coingecko.com/coins/images/12504/thumb/uniswap-uni.png';
+      case 'BTC':
+        return `https://assets.coingecko.com/coins/images/1/thumb/btc.png`;
+      case 'ETH':
+        return `https://assets.coingecko.com/coins/images/1/thumb/eth.png`;
+    }
+  };
+
   return (
     <div className="min-w-[240px] rounded-2xl p-5 border border-gray-200 bg-white">
       <div className="flex items-center space-x-2">
         <img
-          src={`https://assets.coingecko.com/coins/images/1/thumb/${iconId}.png`}
+          src={getIconUrl()}
           alt={symbol}
           className="w-6 h-6"
           onError={(e) => {
@@ -124,7 +110,7 @@ const CryptoCard: FC<CryptoCardProps> = ({ symbol, price, priceChange, chartData
           points={svgPoints}
           fill="none"
           stroke={priceChange >= 0 ? "#22c55e" : "#ef4444"}
-          strokeWidth="2"
+          strokeWidth="1.5"
           vectorEffect="non-scaling-stroke"
         />
       </svg>
@@ -134,10 +120,62 @@ const CryptoCard: FC<CryptoCardProps> = ({ symbol, price, priceChange, chartData
 
 const SUGGESTED_COINS = ['BNB', 'SOL', 'XRP', 'ADA', 'AVAX'];
 const TRENDING_COINS = ['BTC', 'ETH', 'stETH', 'UNI', 'CFG'];
+const ALL_COINS = [...new Set([...SUGGESTED_COINS, ...TRENDING_COINS])];
 
 const SuggestionSection: FC = () => {
-  const { data: suggestedData, chartData: suggestedChartData } = useCryptoData(SUGGESTED_COINS);
-  const { data: trendingData, chartData: trendingChartData } = useCryptoData(TRENDING_COINS);
+  const [allData, setAllData] = useState<CryptoData[]>([]);
+  const [allChartData, setAllChartData] = useState<{ [key: string]: number[] }>({});
+
+  useEffect(() => {
+    const fetchAllData = async () => {
+      try {
+        const responses = await Promise.all(
+          ALL_COINS.map((symbol) =>
+            fetch(`https://api.coincap.io/v2/assets/${ASSET_MAPPING[symbol]?.apiId || symbol.toLowerCase()}`)
+          )
+        );
+        const jsonData = await Promise.all(
+          responses.map((res) => (res.ok ? res.json() : null))
+        );
+        const validData = jsonData.filter((item) => item?.data);
+        
+        const newChartData: { [key: string]: number[] } = {};
+        validData.forEach((item) => {
+          if (item?.data) {
+            newChartData[item.data.symbol] = generateChartData(
+              item.data.symbol,
+              parseFloat(item.data.changePercent24Hr)
+            );
+          }
+        });
+        
+        setAllChartData(newChartData);
+        setAllData(validData.map((item) => item.data));
+
+        // Handle stETH data separately if it's not available from the API
+        if (!validData.find(item => item?.data?.symbol === 'stETH')) {
+          const stethData = {
+            id: 'steth',
+            symbol: 'stETH',
+            priceUsd: '3251.22', // Use ETH price as approximation
+            changePercent24Hr: '0.5'
+          };
+          setAllData(prev => [...prev, stethData]);
+          setAllChartData(prev => ({
+            ...prev,
+            stETH: generateChartData('stETH', 0.5)
+          }));
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchAllData();
+  }, []);
+
+  const suggestedData = allData.filter(coin => SUGGESTED_COINS.includes(coin.symbol));
+  const trendingData = allData.filter(coin => TRENDING_COINS.includes(coin.symbol));
 
   const scrollContainer = (containerId: string, direction: 'left' | 'right') => {
     const container = document.getElementById(containerId);
@@ -171,7 +209,7 @@ const SuggestionSection: FC = () => {
                   symbol={coin.symbol}
                   price={coin.priceUsd}
                   priceChange={parseFloat(coin.changePercent24Hr)}
-                  chartData={suggestedChartData[coin.symbol] || []}
+                  chartData={allChartData[coin.symbol] || []}
                   iconId={ASSET_MAPPING[coin.symbol]?.iconId || coin.symbol.toLowerCase()}
                 />
               ))}
@@ -207,7 +245,7 @@ const SuggestionSection: FC = () => {
                   symbol={coin.symbol}
                   price={coin.priceUsd}
                   priceChange={parseFloat(coin.changePercent24Hr)}
-                  chartData={trendingChartData[coin.symbol] || []}
+                  chartData={allChartData[coin.symbol] || []}
                   iconId={ASSET_MAPPING[coin.symbol]?.iconId || coin.symbol.toLowerCase()}
                 />
               ))}
